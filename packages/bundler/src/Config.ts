@@ -44,7 +44,7 @@ export async function resolveConfiguration (programOpts: any): Promise<{ config:
   config.beneficiary = process.env.BENEFICIARY || config.beneficiary
   config.network = process.env.NETWORK || config.network
   config.entryPoint = process.env.ENTRYPOINT || config.entryPoint
-  
+
   console.log('Merged configuration:', JSON.stringify(config))
 
   const provider: BaseProvider = config.network === 'hardhat'
