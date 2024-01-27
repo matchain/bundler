@@ -1,5 +1,6 @@
 import { BigNumber, BigNumberish, Signer } from 'ethers'
 import { Log, Provider } from '@ethersproject/providers'
+import debug from 'debug'
 
 import { BundlerConfig } from './BundlerConfig'
 import { resolveProperties } from 'ethers/lib/utils'
@@ -159,7 +160,7 @@ export class UserOpMethodHandler {
 
     const userOp = await resolveProperties(userOp1)
 
-    console.log(`UserOperation: Sender=${userOp.sender}  Nonce=${tostr(userOp.nonce)} EntryPoint=${entryPointInput} Paymaster=${getAddr(
+    debug(`UserOperation: Sender=${userOp.sender}  Nonce=${tostr(userOp.nonce)} EntryPoint=${entryPointInput} Paymaster=${getAddr(
       userOp.paymasterAndData)}`)
     await this.execManager.sendUserOperation(userOp, entryPointInput)
     return await this.entryPoint.getUserOpHash(userOp)

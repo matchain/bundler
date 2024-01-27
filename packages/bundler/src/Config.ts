@@ -41,6 +41,9 @@ export async function resolveConfiguration (programOpts: any): Promise<{ config:
     fileConfig = JSON.parse(fs.readFileSync(configFileName, 'ascii'))
   }
   const config = mergeConfigs(bundlerConfigDefault, fileConfig, commandLineParams)
+  config.beneficiary = process.env.BENEFICIARY || config.beneficiary
+  config.network = process.env.NETWORK || config.network
+  
   console.log('Merged configuration:', JSON.stringify(config))
 
   const provider: BaseProvider = config.network === 'hardhat'
@@ -51,7 +54,7 @@ export async function resolveConfiguration (programOpts: any): Promise<{ config:
   let mnemonic: string
   let wallet: Wallet
   try {
-    mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim()
+    mnemonic = process.env.MNEMONIC || fs.readFileSync(config.mnemonic, 'ascii').trim()
     wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
   } catch (e: any) {
     throw new Error(`Unable to read --mnemonic ${config.mnemonic}: ${e.message as string}`)

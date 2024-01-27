@@ -105,7 +105,7 @@ export class BundlerServer {
     debug('>>', { jsonrpc, id, method, params })
     try {
       const result = deepHexlify(await this.handleMethod(method, params))
-      console.log('sent', method, '-', result)
+      debug('sent', method, '-', result)
       debug('<<', { jsonrpc, id, result })
       res.send({
         jsonrpc,

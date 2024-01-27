@@ -56,7 +56,7 @@ export class BundleManager {
 
       const [bundle, storageMap] = await this.createBundle()
       if (bundle.length === 0) {
-        debug('sendNextBundle - no bundle to send')
+        console.log('sendNextBundle - no bundle to send')
       } else {
         const beneficiary = await this._selectBeneficiary()
         const ret = await this.sendBundle(bundle, beneficiary, storageMap)
@@ -77,15 +77,12 @@ export class BundleManager {
    */
   async sendBundle (userOps: UserOperation[], beneficiary: string, storageMap: StorageMap): Promise<SendBundleReturn | undefined> {
     try {
-      const feeData = await this.provider.getFeeData()
       const tx = await this.entryPoint.populateTransaction.handleOps(userOps, beneficiary, {
-        type: 2,
         nonce: await this.signer.getTransactionCount(),
-        gasLimit: 10e6,
-        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? 0,
-        maxFeePerGas: feeData.maxFeePerGas ?? 0
+        gasLimit: 10e6
       })
       tx.chainId = this.provider._network.chainId
+      tx.gasPrice = await this.provider.getGasPrice()
       const signedTx = await this.signer.signTransaction(tx)
       let ret: string
       if (this.conditionalRpc) {
@@ -161,20 +158,6 @@ export class BundleManager {
     for (const entry of entries) {
       const paymaster = getAddr(entry.userOp.paymasterAndData)
       const factory = getAddr(entry.userOp.initCode)
-      const paymasterStatus = this.reputationManager.getStatus(paymaster)
-      const deployerStatus = this.reputationManager.getStatus(factory)
-      if (paymasterStatus === ReputationStatus.BANNED || deployerStatus === ReputationStatus.BANNED) {
-        this.mempoolManager.removeUserOp(entry.userOp)
-        continue
-      }
-      if (paymaster != null && (paymasterStatus === ReputationStatus.THROTTLED ?? (stakedEntityCount[paymaster] ?? 0) > 1)) {
-        debug('skipping throttled paymaster', entry.userOp.sender, entry.userOp.nonce)
-        continue
-      }
-      if (factory != null && (deployerStatus === ReputationStatus.THROTTLED ?? (stakedEntityCount[factory] ?? 0) > 1)) {
-        debug('skipping throttled factory', entry.userOp.sender, entry.userOp.nonce)
-        continue
-      }
       if (senders.has(entry.userOp.sender)) {
         debug('skipping already included sender', entry.userOp.sender, entry.userOp.nonce)
         // allow only a single UserOp per sender per bundle
