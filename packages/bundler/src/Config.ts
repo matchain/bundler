@@ -43,6 +43,7 @@ export async function resolveConfiguration (programOpts: any): Promise<{ config:
   const config = mergeConfigs(bundlerConfigDefault, fileConfig, commandLineParams)
   config.beneficiary = process.env.BENEFICIARY || config.beneficiary
   config.network = process.env.NETWORK || config.network
+  config.entryPoint = process.env.ENTRYPOINT || config.entryPoint
   
   console.log('Merged configuration:', JSON.stringify(config))
 
