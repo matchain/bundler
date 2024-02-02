@@ -37,9 +37,14 @@ export class EventsManager {
     if (this.lastBlock === undefined) {
       this.lastBlock = Math.max(1, await this.entryPoint.provider.getBlockNumber() - 1000)
     }
-    const events = await this.entryPoint.queryFilter({ address: this.entryPoint.address }, this.lastBlock)
-    for (const ev of events) {
-      this.handleEvent(ev)
+    try {
+      console.log(`lastBlock is ${this.lastBlock}`)
+      const events = await this.entryPoint.queryFilter({ address: this.entryPoint.address }, this.lastBlock)
+      for (const ev of events) {
+        this.handleEvent(ev)
+      }
+    } catch (e) {
+      console.log(e)
     }
   }
 
