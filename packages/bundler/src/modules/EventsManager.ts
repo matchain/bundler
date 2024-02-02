@@ -44,7 +44,9 @@ export class EventsManager {
         this.handleEvent(ev)
       }
     } catch (e) {
+      console.log('start logging handlePastEvents error')
       console.log(e)
+      console.log('end logging handlePastEvents error')
     }
   }
 
