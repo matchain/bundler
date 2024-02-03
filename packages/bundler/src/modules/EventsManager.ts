@@ -43,6 +43,10 @@ export class EventsManager {
       for (const ev of events) {
         this.handleEvent(ev)
       }
+
+      if (events.length === 0) {
+        this.lastBlock = await this.entryPoint.provider.getBlockNumber()
+      }
     } catch (e) {
       console.log('start logging handlePastEvents error')
       console.log(e)
